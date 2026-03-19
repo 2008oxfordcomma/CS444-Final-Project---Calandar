@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Dre Harm">
+    <meta name="author" content="Ethan Larson">
+    <title>Calendar Prototype</title>
+    <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+    <nav class="navbar">
+        <div class="container">
+        <div class="nav-content">
+            <div class="logo-section">
+            <div class="logo-box"></div>
+            <span class="site-title">Calendar</span>
+            </div>
+            <div class="nav-buttons">
+            <button class="nav-btn active">Calendar</button>
+            <button class="nav-btn">Today</button>
+            <button class="nav-btn">Assignments</button>
+            </div>
+        </div>
+        </div>
+    </nav>
+    <main class="main-content">
+        <div class="container">
+        <div class="grid-layout">
+            <!-- grid for calender -->
+            <div class="calendar-section">
+            <div class="calendar-box">
+                <div class="calendar-header">
+                <h2 id="month-year">March 2026</h2>
+                <div class="calendar-controls">
+                    <button class="control-btn">←</button>
+                    <button class="control-btn">Today</button>
+                    <button class="control-btn">→</button>
+                    <button class="control-btn active">+ Add</button>
+                </div>
+                </div>
+                <!-- days for the calendar -->
+                <div class="calendar-body">
+                <div class="calendar-grid">
+                    <!-- day headers -->
+                    <div class="day-header">Sun</div>
+                    <div class="day-header">Mon</div>
+                    <div class="day-header">Tue</div>
+                    <div class="day-header">Wed</div>
+                    <div class="day-header">Thu</div>
+                    <div class="day-header">Fri</div>
+                    <div class="day-header">Sat</div>
+
+                    <!-- need some blank days to move the start of the month-->
+                    <div class="day-cell empty"></div>
+                    <div class="day-cell empty"></div>
+                    <div class="day-cell empty"></div>
+                    <div class="day-cell empty"></div>
+                    <div class="day-cell empty"></div>
+                    <div class="day-cell empty"></div>
+
+                    <div class="day-cell"><div class="day-number">1</div></div>
+                    <div class="day-cell"><div class="day-number">2</div></div>
+                    <div class="day-cell"><div class="day-number">3</div></div>
+                    <div class="day-cell"><div class="day-number">4</div></div>
+                    <div class="day-cell"><div class="day-number">5</div></div>
+                    <div class="day-cell"><div class="day-number">6</div></div>
+                    <div class="day-cell"><div class="day-number">7</div></div>
+                    <div class="day-cell"><div class="day-number">8</div></div>
+                    <div class="day-cell"><div class="day-number">9</div></div>
+                    <div class="day-cell"><div class="day-number">10</div></div>
+                    <div class="day-cell"><div class="day-number">11</div></div>
+                    <div class="day-cell"><div class="day-number">12</div></div>
+                    <div class="day-cell"><div class="day-number">13</div></div>
+                    <div class="day-cell"><div class="day-number">14</div></div>
+                    <div class="day-cell"><div class="day-number">15</div></div>
+                    <div class="day-cell"><div class="day-number">16</div></div>
+                    <div class="day-cell"><div class="day-number">17</div></div>
+                    <div class="day-cell">
+                    <div class="day-number">18</div>
+                    <div class="events">
+                        <div class="event-tag">HW2 Due</div>
+                        <div class="event-tag">Project Proposal</div>
+                    </div>
+                    </div>
+                    <div class="day-cell today"><div class="day-number">19</div>
+                        <div class="events">
+                            <div class="event-tag">Mid-term</div>
+                            <div class="event-tag">Project Due</div>
+                        </div>
+                    </div>
+                    <div class="day-cell"><div class="day-number">20</div></div>
+                    <div class="day-cell"><div class="day-number">21</div></div>
+                    <div class="day-cell"><div class="day-number">22</div></div>
+                    <div class="day-cell"><div class="day-number">23</div></div>
+                    <div class="day-cell"><div class="day-number">24</div></div>
+                    <div class="day-cell"><div class="day-number">25</div>
+                        <div class="events">
+                            <div class="event-tag">Presentation</div>
+                        </div>
+                    </div>
+                    <div class="day-cell"><div class="day-number">26</div></div>
+                    <div class="day-cell"><div class="day-number">27</div></div>
+                    <div class="day-cell"><div class="day-number">28</div></div>
+                    <div class="day-cell"><div class="day-number">29</div></div>
+                    <div class="day-cell"><div class="day-number">30</div></div>
+                    <div class="day-cell"><div class="day-number">31</div></div>
+                </div>
+                </div>
+            </div>
+            </div>
+            <div class="events-section">
+            <div class="events-box">
+                <h3 class="events-title">Mar 19</h3>
+                <div class="event-card">
+                <div class="event-content">
+                    <div class="event-header">
+                    <input type="checkbox" class="event-checkbox">
+                    <h4>Mid-term</h4>
+                    <span class="event-type">Exam</span>
+                    </div>
+                    <div class="event-details">
+                    <div>8:00 - 9:30</div>
+                    <div class="event-note">Cichanowski</div>
+                    </div>
+                </div>
+                <div class="event-actions">
+                    <button class="action-btn">Edit</button>
+                    <button class="action-btn">Del</button>
+                </div>
+                </div>
+                <div class="event-card">
+                <div class="event-content">
+                    <div class="event-header">
+                        <input type="checkbox" class="event-checkbox">
+                    <h4>Project Due</h4>
+                    <span class="event-type">Assignment</span>
+                    </div>
+                    <div class="event-details">
+                    <div>11:59 PM</div>
+                    <div class="event-note">Submit online</div>
+                    </div>
+                </div>
+                <div class="event-actions">
+                    <button class="action-btn">Edit</button>
+                    <button class="action-btn">Del</button>
+                </div>
+                </div>
+            </div>
+            </div>
+        </div>
+        </div>
+    </main>
+    </body>
+</html>

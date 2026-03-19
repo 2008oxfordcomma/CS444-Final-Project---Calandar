@@ -1,0 +1,288 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  background: white;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+/* top nav bar stuff */
+.navbar {
+  border-bottom: 2px solid #1f2937;
+  background: white;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.nav-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+
+/* if we want to add a logo we can add this 
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo-box {
+  width: 40px;
+  height: 40px;
+  border: 2px solid #1f2937;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+*/
+
+.site-title {
+  font-size: 18px;
+}
+
+.nav-buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.nav-btn {
+  padding: 0.5rem 1rem;
+  border: 2px solid #1f2937;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+/* use this one to show if calandar, today, or assignments tab is clicked */
+.nav-btn.active {
+  background: #1f2937;
+  color: white;
+}
+
+.main-content {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background: #f9fafb;
+  min-height: calc(100vh - 64px);
+}
+
+/* stuff for the calendar section */
+.calendar-box {
+  border: 2px solid #1f2937;
+  background: white;
+}
+
+.calendar-header {
+  padding: 1rem;
+  border-bottom: 2px solid #1f2937;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.calendar-header h2 {
+  font-size: 20px;
+}
+
+.calendar-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.control-btn {
+  padding: 0.25rem 0.75rem;
+  border: 2px solid #1f2937;
+  background: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.control-btn.active {
+  background: #1f2937;
+  color: white;
+  margin-left: 0.5rem;
+}
+
+.calendar-body {
+  padding: 1rem;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  border: 2px solid #1f2937;
+}
+
+.day-header {
+  border: 1px solid #1f2937;
+  padding: 0.5rem;
+  text-align: center;
+  background: #f3f4f6;
+  font-size: 14px;
+}
+
+.day-cell {
+  border: 1px solid #1f2937;
+  min-height: 96px;
+  padding: 0.5rem;
+  background: white;
+  cursor: pointer;
+}
+
+.day-cell.empty {
+  background: #f9fafb;
+}
+
+.day-cell.today {
+  border: 4px solid #111827;
+}
+
+.day-number {
+  font-size: 14px;
+  margin-bottom: 0.25rem;
+}
+
+.day-cell.today .day-number {
+  font-weight: bold;
+}
+
+.events {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.event-tag {
+  font-size: 12px;
+  padding: 0.125rem 0.25rem;
+  border: 1px solid #4b5563;
+  background: #e5e7eb;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* task area */
+.events-box {
+  border: 2px solid #1f2937;
+  background: white;
+  padding: 1rem;
+}
+
+.events-title {
+  margin-bottom: 1rem;
+  font-size: 18px;
+  border-bottom: 2px solid #1f2937;
+  padding-bottom: 0.5rem;
+}
+
+.event-card {
+  padding: 0.75rem;
+  border: 2px solid #1f2937;
+  background: white;
+  margin-bottom: 0.75rem;
+}
+
+.event-card {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.event-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.event-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.event-checkbox {
+  width: 16px;
+  height: 16px;
+}
+
+.event-header h4 {
+  font-size: 16px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.event-type {
+  padding: 0.125rem 0.5rem;
+  border: 1px solid #4b5563;
+  background: #e5e7eb;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.event-details {
+  font-size: 14px;
+  color: #4b5563;
+}
+
+.event-note {
+  color: #6b7280;
+  font-size: 12px;
+}
+
+.event-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #4b5563;
+  background: white;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+/* to be safe and explict, AI was used to adjust styles below this line */
+
+.event-card:last-child {
+  margin-bottom: 0;
+}
+
+.control-btn:first-child,
+.control-btn:nth-child(3) {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.grid-layout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .grid-layout {
+    grid-template-columns: 1fr;
+  }
+}
