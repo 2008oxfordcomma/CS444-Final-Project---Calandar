@@ -1,3 +1,7 @@
+/* disclaimer: ai was used to 1) write the modal CSS, 
+                              2) make needed changes based on my initial code to fit different media sizes, 
+                              3) to convert most of the initial px values from the prototype wireframe to rem units. 
+   I did run the css through https://www.codebeautifier.com/ to consolidate similar styles */
 * {
   margin: 0;
   padding: 0;
@@ -313,6 +317,7 @@ button {
   background: white;
   font-size: 10px;
   font-weight: 500;
+  height: 28px;
 }
 .action-btn:hover {
   background: #f3f4f6;
@@ -398,6 +403,46 @@ button {
   grid-template-columns: 2fr 1fr;
   gap: 1.5rem;
 }
+
+.time-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.start-time-group, .end-time-group {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.time-group select {
+  width: auto;
+  min-width: 70px;
+}
+
+.time-sep {
+  font-size: 14px;
+  font-weight: 500;
+  color: #4b5563;
+}
+
+.no-end-time {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 12px;
+  font-weight: normal;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.no-end-time input {
+  width: auto;
+  margin: 0;
+}
+
 
 /* to be safe and explict, AI was used to adjust and/or generate the modal and form stuff below this line*/
 
@@ -510,40 +555,6 @@ form {
 }
 .submit-btn:hover {
   background: #374151;
-}
-.custom-color-picker {
-  position: fixed;
-  background: white;
-  border: 2px solid #1f2937;
-  padding: 0.5rem;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 0.5rem;
-  z-index: 10000;
-  min-width: 180px;
-}
-.color-option {
-  width: 30px;
-  height: 30px;
-  cursor: pointer;
-  border: 2px solid transparent;
-}
-.color-option:hover {
-  transform: scale(1.1);
-  border-color: #1f2937;
-}
-.custom-color-option {
-  grid-column: span 5;
-  padding: 0.5rem;
-  text-align: center;
-  cursor: pointer;
-  border-top: 1px solid #e5e7eb;
-  font-size: 12px;
-  color: #4b5563;
-}
-.custom-color-option:hover {
-  background: #f3f4f6;
-  color: #1f2937;
 }
 textarea {
   white-space: pre-wrap;
@@ -752,6 +763,22 @@ textarea {
   .custom-color-option {
     font-size: 10px;
     padding: 0.35rem;
+  }
+  .time-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .start-time-group, .end-time-group {
+    justify-content: center;
+  }
+  
+  .time-sep {
+    text-align: center;
+  }
+  
+  .no-end-time {
+    justify-content: center;
   }
 }
 @media (max-width: 480px) {
