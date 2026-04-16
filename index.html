@@ -1,142 +1,202 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="author" content="Dre Harm">
-    <meta name="author" content="Ethan Larson">
-    <title>Class Calendar</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <nav class="navbar">
-        <div class="container">
-            <div class="nav-content">
-                <div class="logo-section">
-                    <div class="logo-box"></div>
-                    <span class="site-title">Class Calendar</span>
-                </div>
-                <div class="nav-buttons">
-                    <button onclick="window.location.href='index.html'" class="nav-btn active">Calendar</button>
-                    <button onclick="window.location.href='today.html'" class="nav-btn">Today</button>
-                    <button onclick="window.location.href='assignments.html'" class="nav-btn">Assignments</button>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="author" content="Dre Harm">
+        <meta name="author" content="Ethan Larson">
+        <title>Class Calendar</title>
+        <link rel="stylesheet" href="styles.css">
+    </head>
+    <body>
+        <nav class="navbar">
+            <div class="container">
+                <div class="nav-content">
+                    <div class="logo-section">
+                        <div class="logo-box"></div>
+                        <span class="site-title">Class Calendar</span>
+                    </div>
+                    <div class="nav-buttons">
+                        <button onclick="window.location.href='index.html'" class="nav-btn active">Calendar</button>
+                        <button onclick="window.location.href='today.html'" class="nav-btn">Today</button>
+                        <button onclick="window.location.href='assignments.html'" class="nav-btn">Assignments</button>
+                    </div>
                 </div>
             </div>
-        </div>
-    </nav>
-    <main class="main-content">
-        <div class="container">
-            <div class="grid-layout">
-                <div class="calendar-section">
-                    <div class="calendar-box">
-                        <div class="calendar-header">
-                            <h2 id="month-year"></h2>
-                            <div class="calendar-controls">
-                                <button class="control-btn" id="prevMonth">←</button>
-                                <button class="control-btn" id="todayBtn">Today</button>
-                                <button class="control-btn" id="nextMonth">→</button>
+        </nav>
+        <main class="main-content">
+            <div class="container">
+                <div class="grid-layout">
+                    <div class="calendar-section">
+                        <div class="calendar-box">
+                            <div class="calendar-header">
+                                <h2 id="month-year"></h2>
+                                <div class="calendar-controls">
+                                    <button class="control-btn" id="prevMonth">←</button>
+                                    <button class="control-btn" id="todayBtn">Today</button>
+                                    <button class="control-btn" id="nextMonth">→</button>
+                                </div>
+                            </div>
+                            <div class="calendar-body">
+                                <div class="calendar-grid" id="calendarGrid"></div>
                             </div>
                         </div>
-                        <div class="calendar-body">
-                            <div class="calendar-grid" id="calendarGrid"></div>
-                        </div>
                     </div>
-                </div>
-                <div class="right-panel">
-                    <div class="events-box">
-                        <div class="events-header">
-                            <h3 class="events-title" id="selectedDate">Select a day</h3>
-                            <button class="add-event-btn" id="addEventBtn">+ Add Event</button>
+                    <div class="right-panel">
+                        <div class="events-box">
+                            <div class="events-header">
+                                <h3 class="events-title" id="selectedDate">Select a day</h3>
+                                <button class="add-event-btn" id="addEventBtn">+ Add Event</button>
+                            </div>
+                            <div id="eventsList"></div>
                         </div>
-                        <div id="eventsList"></div>
-                    </div>
-                    <div class="classes-box">
-                        <div class="classes-header">
-                            <h3 class="classes-title">Filter by Class</h3>
-                            <button class="add-class-btn" id="addClassBtn">+ Add Class</button>
-                        </div>
-                        <div class="classes-list" id="classesList"></div>
-                        <div class="filter-actions">
-                            <button class="filter-btn" id="selectAllBtn">Select All</button>
-                            <button class="filter-btn" id="clearAllBtn">Clear All</button>
+                        <div class="classes-box">
+                            <div class="classes-header">
+                                <h3 class="classes-title">Filter by Class</h3>
+                                <button class="add-class-btn" id="addClassBtn">+ Add Class</button>
+                            </div>
+                            <div class="classes-list" id="classesList"></div>
+                            <div class="filter-actions">
+                                <button class="filter-btn" id="selectAllBtn">Select All</button>
+                                <button class="filter-btn" id="clearAllBtn">Clear All</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </main>
-    <!-- ai was used to make both these forms -->
-    <div id="eventModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="eventModalTitle">Add Event</h3>
-                <span class="close-btn">&times;</span>
-            </div>
-            <form id="eventForm">
-                <div class="form-group">
-                    <label for="eventTitle">Title *</label>
-                    <input type="text" id="eventTitle" required>
+        </main>
+        <div id="eventModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="eventModalTitle">Add Event</h3>
+                    <span class="close-btn">&times;</span>
                 </div>
-                <div class="form-group">
-                    <label for="eventType">Type</label>
-                    <select id="eventType">
-                        <option value="Assignment">Assignment</option>
-                        <option value="Discussion">Discussion</option>
-                        <option value="Quiz">Quiz</option>
-                        <option value="Exam">Exam</option>
-                        <option value="Meeting">Meeting</option>
-                        <option value="Lecture">Lecture</option>
-                        <option value="Task">Work</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="eventTime">Time</label>
-                    <input type="text" id="eventTime" placeholder="e.g., 11:59 PM or 2:00 PM">
-                </div>
-                <div class="form-group">
-                    <label for="eventNote">Note</label>
-                    <textarea id="eventNote" rows="2" placeholder="Additional details..."></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="eventClass">Class (Optional)</label>
-                    <select id="eventClass">
-                        <option value="">-- No Class --</option>
-                    </select>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="cancel-btn" id="cancelEventBtn">Cancel</button>
-                    <button type="submit" class="submit-btn">Save Event</button>
-                </div>
-            </form>
-        </div>
-    </div>
-    <div id="classModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="classModalTitle">Add Class</h3>
-                <span class="close-btn">&times;</span>
-            </div>
-            <form id="classForm">
-                <div class="form-group">
-                    <label for="className">Class Name *</label>
-                    <input type="text" id="className" required placeholder="e.g., CS 444 - Senior Project">
-                </div>
-                <div class="form-group">
-                    <label for="classColor">Class Color</label>
-                    <input type="color" id="classColor" value="#3b82f6">
-                    <div class="color-preview">
-                        <span>Selected color: </span>
-                        <span class="color-sample" id="colorSample"></span>
+                <form id="eventForm">
+                    <div class="form-group">
+                        <label for="eventTitle">Title *</label>
+                        <input type="text" id="eventTitle" required>
                     </div>
-                </div>
-                <div class="form-actions">
-                    <button type="button" class="cancel-btn" id="cancelClassBtn">Cancel</button>
-                    <button type="submit" class="submit-btn">Save Class</button>
-                </div>
-            </form>
+                    <div class="form-group">
+                        <label for="eventType">Type</label>
+                        <select id="eventType">
+                            <option value="Assignment">Assignment</option>
+                            <option value="Discussion">Discussion</option>
+                            <option value="Quiz">Quiz</option>
+                            <option value="Exam">Exam</option>
+                            <option value="Meeting">Meeting</option>
+                            <option value="Lecture">Lecture</option>
+                            <option value="Task">Work</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Time</label>
+                        <div class="time-group">
+                            <div class="start-time-group">
+                                <select id="eventStartHour">
+                                    <option value="">Hour</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                </select>
+                                <select id="eventStartMinute">
+                                    <option value="">Min</option>
+                                    <option value="00">00</option>
+                                    <option value="15">15</option>
+                                    <option value="30">30</option>
+                                    <option value="45">45</option>
+                                </select>
+                                <select id="eventStartAmPm">
+                                    <option value="AM">AM</option>
+                                    <option value="PM">PM</option>
+                                </select>
+                            </div>
+                            <span class="time-sep">to</span>
+                            <div class="end-time-group">
+                                <select id="eventEndHour">
+                                    <option value="">Hour</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                </select>
+                                <select id="eventEndMinute">
+                                    <option value="">Min</option>
+                                    <option value="00">00</option>
+                                    <option value="15">15</option>
+                                    <option value="30">30</option>
+                                    <option value="45">45</option>
+                                </select>
+                                <select id="eventEndAmPm">
+                                    <option value="AM">AM</option>
+                                    <option value="PM">PM</option>
+                                </select>
+                            </div>
+                            <label class="no-end-time">
+                                <input style="width: 50%;" type="checkbox" id="noEndTime"> No end time
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventNote">Note</label>
+                        <textarea id="eventNote" rows="2" placeholder="Additional details..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="eventClass">Class (Optional)</label>
+                        <select id="eventClass">
+                            <option value="">-- No Class --</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="cancel-btn" id="cancelEventBtn">Cancel</button>
+                        <button type="submit" class="submit-btn">Save Event</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </div>
-    <script src="script.js"></script>
-</body>
+        <div id="classModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="classModalTitle">Add Class</h3>
+                    <span class="close-btn">&times;</span>
+                </div>
+                <form id="classForm">
+                    <div class="form-group">
+                        <label for="className">Class Name *</label>
+                        <input type="text" id="className" required placeholder="e.g., CS 444 - Senior Project">
+                    </div>
+                    <div class="form-group">
+                        <label for="classColor">Class Color</label>
+                        <input type="color" id="classColor" value="#3b82f6">
+                        <div class="color-preview">
+                            <span>Selected color: </span>
+                            <span class="color-sample" id="colorSample"></span>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="cancel-btn" id="cancelClassBtn">Cancel</button>
+                        <button type="submit" class="submit-btn">Save Class</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script src="script.js"></script>
+    </body>
 </html>
