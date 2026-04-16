@@ -1,331 +1,659 @@
- // disclaimer: my initial code was passed through ai with the prompt to shorten and clean up messy logic, however it should be noted that the features were designed and implemented by me
+// disclaimer: ai was only consulted to write the popup aspect of the forms (the modal opening closing and form resetting).
 
-let events = new Map();
-let classes = new Map();
-let activeFilters = new Set();
-let currentDate = new Date();
+let events = [];
+let classes = [];
+let activeClassFilters = [];
+let currentYear = new Date().getFullYear();
+let currentMonth = new Date().getMonth();
+let selectedYear = null;
+let selectedMonth = null;
 let selectedDay = null;
-let editingEvent = null, editingClass = null;
+let editingEventId = null;
+let editingEventDate = null;
+let editingClassId = null;
 
-const colors = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#ec4899", "#06b6d4", "#84cc16", "#f97316", "#6366f1"];
-
-function loadSamples() {
-  const sampleClasses = [
-    { id: "cs444", name: "CS 444 - HCI", color: "#3b82f6" },
-    { id: "psy335", name: "PSY - 335", color: "#10b981" },
-    { id: "cs375", name: "CS 375 - Computer Systems", color: "#f59e0b" },
-    { id: "cs366", name: "CS 366 - Systems Programming", color: "#ef4444" },
-    { id: "cs346", name: "CS 346 - Intro to IoT", color: "#7bff00" }
-  ];
-  sampleClasses.forEach(c => { classes.set(c.id, c); activeFilters.add(c.id); });
-
-  const today = new Date();
-  const key = (y,m,d) => `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-  
-  events.set(key(2026, 3, 14), [
-    { id: crypto.randomUUID(), title: "Quiz 2", type: "Quiz", time: "4:30PM", note: "Can have a 1/2 sheet of paper notes", classId: "cs366", completed: false },
-  ]);
-  events.set(key(2026, 3, 13), [
-    { id: crypto.randomUUID(), title: "Exam 4", type: "Exam", time: "10:00AM", note: "", classId: "psy335", completed: false }
-  ]);
-  events.set(key(2026, 3, 30), [
-    { id: crypto.randomUUID(), title: "Final Presentation", type: "Exam", time: "3PM", note: "", classId: "cs444", completed: false }
-  ]);
-  events.set(key(2026, 3, 14), [
-    { id: crypto.randomUUID(), title: "Finish Tic-Tac-Toe", type: "Task", time: "", note: "", classId: "cs366", completed: false }
-  ]);
-  events.set(key(2026, 3, 21), [
-    { id: crypto.randomUUID(), title: "Begin Making Final Presentation Slides", type: "Other", time: "", note: "", classId: "cs366", completed: false }
-  ]);
+function startCalendar() {
+    renderClassList();
+    renderCalendar();
+    
+    let today = new Date();
+    selectDay(today.getFullYear(), today.getMonth(), today.getDate());
+    
+    setupModals();
+    setupButtons();
 }
 
-function saveData() {
-  localStorage.setItem('classes', JSON.stringify([...classes.values()]));
-  localStorage.setItem('events', JSON.stringify([...events.entries()]));
-}
-
-function loadData() {
-  const savedClasses = localStorage.getItem('classes');
-  if(savedClasses) {
-    JSON.parse(savedClasses).forEach(c => classes.set(c.id, c));
-    activeFilters.clear();
-    classes.forEach(c => activeFilters.add(c.id));
-  }
-  const savedEvents = localStorage.getItem('events');
-  if(savedEvents) events = new Map(JSON.parse(savedEvents));
-  if(classes.size === 0) loadSamples();
-  if(events.size === 0 && classes.size > 0) loadSamples();
-}
-
-function formatDate(y,m,d) { return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
-function escape(s) { return s?.replace(/[&<>]/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;'})[m]) || ''; }
-function truncate(s, n) { return s?.length > n ? s.slice(0,n-3)+'...' : s || ''; }
-
-function toggleComplete(dateKey, eventId, checked) {
-  const dayEvents = events.get(dateKey);
-  if(dayEvents) {
-    const event = dayEvents.find(e => e.id === eventId);
-    if(event) {
-      event.completed = checked;
-      saveData();
-      renderCalendar();
-      if(selectedDay) showEvents(selectedDay.y, selectedDay.m, selectedDay.d);
+function setupModals() {
+    let closeBtns = document.querySelectorAll(".close-btn");
+    for (let i = 0; i < closeBtns.length; i++) {
+        closeBtns[i].onclick = function() {
+            let modal = this.closest(".modal");
+            if (modal) modal.style.display = "none";
+        };
     }
-  }
+    
+    document.getElementById("cancelEventBtn").onclick = function() {
+        document.getElementById("eventModal").style.display = "none";
+        editingEventId = null;
+    };
+    
+    document.getElementById("cancelClassBtn").onclick = function() {
+        document.getElementById("classModal").style.display = "none";
+        editingClassId = null;
+    };
+    
+    document.getElementById("eventForm").onsubmit = saveEvent;
+    document.getElementById("classForm").onsubmit = saveClass;
+    
+    let noEndTimeCheck = document.getElementById("noEndTime");
+    noEndTimeCheck.onchange = function() {
+        let endGroup = document.querySelector(".end-time-group");
+        if (this.checked) {
+            endGroup.style.opacity = "0.5";
+            endGroup.style.pointerEvents = "none";
+        } else {
+            endGroup.style.opacity = "1";
+            endGroup.style.pointerEvents = "auto";
+        }
+    };
+    
+    document.getElementById("classColor").oninput = function() {
+        document.getElementById("colorSample").style.background = this.value;
+    };
+}
+
+function formatDate(year, month, day) {
+    let monthNum = month + 1;
+    let monthStr = monthNum < 10 ? "0" + monthNum : "" + monthNum;
+    let dayStr = day < 10 ? "0" + day : "" + day;
+    return year + "-" + monthStr + "-" + dayStr;
+}
+
+function getEventsForDate(dateStr) {
+    let result = [];
+    for (let i = 0; i < events.length; i++) {
+        if (events[i].date === dateStr) {
+            result.push(events[i]);
+        }
+    }
+    return result;
+}
+
+function getClassInfo(classId) {
+    for (let i = 0; i < classes.length; i++) {
+        if (classes[i].id === classId) {
+            return { color: classes[i].color, name: classes[i].name };
+        }
+    }
+    return { color: "#999999", name: "No Class" };
+}
+
+function isClassFilterActive(classId) {
+    for (let i = 0; i < activeClassFilters.length; i++) {
+        if (activeClassFilters[i] === classId) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function filterEventsByClass(eventsArray) {
+    let result = [];
+    for (let i = 0; i < eventsArray.length; i++) {
+        if (isClassFilterActive(eventsArray[i].classId) || !eventsArray[i].classId) {
+            result.push(eventsArray[i]);
+        }
+    }
+    return result;
 }
 
 function renderCalendar() {
-  const y = currentDate.getFullYear(), m = currentDate.getMonth();
-  document.getElementById('month-year').innerText = `${['January','February','March','April','May','June','July','August','September','October','November','December'][m]} ${y}`;
-  
-  const firstDay = new Date(y,m,1).getDay();
-  const daysInMonth = new Date(y,m+1,0).getDate();
-  let html = '<div class="day-header">Sun</div><div class="day-header">Mon</div><div class="day-header">Tue</div><div class="day-header">Wed</div><div class="day-header">Thu</div><div class="day-header">Fri</div><div class="day-header">Sat</div>';
-  
-  for(let i=0, day=1; i<42; i++) {
-    if(i < firstDay || day > daysInMonth) html += '<div class="day-cell empty"></div>';
-    else {
-      const dateKey = formatDate(y,m,day);
-      const allEvents = events.get(dateKey) || [];
-      const visibleEvents = allEvents.filter(e => !e.classId || activeFilters.has(e.classId));
-      const eventsHtml = visibleEvents.length ? `<div class="events">${visibleEvents.slice(0,2).map(e => `<div class="event-tag ${e.completed ? 'completed' : ''}" style="border-left:3px solid ${classes.get(e.classId)?.color||'#999'}">${escape(truncate(e.title,20))}</div>`).join('')}${visibleEvents.length>2 ? `<div class="event-tag">+${visibleEvents.length-2} more</div>` : ''}</div>` : '';
-      const isSelected = selectedDay && selectedDay.y === y && selectedDay.m === m && selectedDay.d === day;
-      html += `<div class="day-cell ${isSelected ? 'selected-day' : ''}" data-year="${y}" data-month="${m}" data-day="${day}"><div class="day-number">${day}</div>${eventsHtml}</div>`;
-      day++;
-    }
-  }
-  document.getElementById('calendarGrid').innerHTML = html;
-  document.querySelectorAll('.day-cell:not(.empty)').forEach(cell => {
-    cell.onclick = () => {
-      const y = parseInt(cell.dataset.year);
-      const m = parseInt(cell.dataset.month);
-      const d = parseInt(cell.dataset.day);
-      selectDay(y, m, d);
-    };
-  });
-}
-
-function selectDay(y, m, d) {
-  selectedDay = { y, m, d };
-  renderCalendar();
-  showEvents(y, m, d);
-}
-
-function showEvents(y, m, d) {
-  const dateKey = formatDate(y, m, d);
-  const allEvents = events.get(dateKey) || [];
-  const visibleEvents = allEvents.filter(e => !e.classId || activeFilters.has(e.classId));
-  const date = new Date(y, m, d);
-  document.getElementById('selectedDate').innerText = date.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric' });
-  
-  if(!visibleEvents.length) return document.getElementById('eventsList').innerHTML = '<div class="no-events">No events</div>';
-  
-  document.getElementById('eventsList').innerHTML = visibleEvents.map(e => `
-    <div class="event-card" style="border-left:4px solid ${classes.get(e.classId)?.color||'#999'}">
-      <div class="event-content">
-        <div class="event-header">
-          <input type="checkbox" class="event-checkbox" data-id="${e.id}" ${e.completed ? 'checked' : ''}>
-          <h4 style="${e.completed ? 'text-decoration: line-through; opacity: 0.6;' : ''}" title="${escape(e.title)}">${escape(truncate(e.title,30))}</h4>
-          <span class="event-type">${escape(e.type)}</span>
-        </div>
-        <div class="event-details">${escape(e.time)}</div>
-        <div class="event-note">${escape(truncate(e.note,50))}</div>
-        <div class="event-note" style="color:${classes.get(e.classId)?.color||'#999'}">${escape(classes.get(e.classId)?.name||'No Class')}</div>
-      </div>
-      <div class="event-actions">
-        <button class="action-btn edit-event" data-id="${e.id}">Edit</button>
-        <button class="action-btn delete-event" data-id="${e.id}">Del</button>
-      </div>
-    </div>
-  `).join('');
-  
-  document.querySelectorAll('.event-checkbox').forEach(cb => {
-    cb.onchange = (e) => {
-      e.stopPropagation();
-      const eventId = cb.dataset.id;
-      const isChecked = cb.checked;
-      toggleComplete(dateKey, eventId, isChecked);
-      const card = cb.closest('.event-card');
-      const title = card.querySelector('h4');
-      if(isChecked) {
-        title.style.textDecoration = 'line-through';
-        title.style.opacity = '0.6';
-      } else {
-        title.style.textDecoration = 'none';
-        title.style.opacity = '1';
-      }
-    };
-  });
-  
-  document.querySelectorAll('.edit-event').forEach(btn => btn.onclick = () => openEventModal(allEvents.find(e => e.id === btn.dataset.id), dateKey));
-  document.querySelectorAll('.delete-event').forEach(btn => btn.onclick = () => { if(confirm('Delete?')) { events.set(dateKey, allEvents.filter(e => e.id !== btn.dataset.id)); if(!events.get(dateKey)?.length) events.delete(dateKey); saveData(); showEvents(y, m, d); renderCalendar(); } });
-}
-
-function renderClasses() {
-  document.getElementById('classesList').innerHTML = [...classes.values()].map(c => `
-    <div class="class-item" data-id="${c.id}">
-      <input type="checkbox" class="class-checkbox" ${activeFilters.has(c.id) ? 'checked' : ''}>
-      <span class="class-name" title="${escape(c.name)}">${escape(truncate(c.name,30))}</span>
-      <div class="class-actions">
-        <div class="class-color" style="background:${c.color}"></div>
-        <button class="class-edit-btn">✏️</button>
-        <button class="class-delete-btn">🗑️</button>
-      </div>
-    </div>
-  `).join('');
-  
-  document.querySelectorAll('.class-checkbox').forEach(cb => {
-    cb.onclick = (e) => {
-      e.stopPropagation();
-      const id = cb.closest('.class-item').dataset.id;
-      if(cb.checked) {
-        activeFilters.add(id);
-      } else {
-        activeFilters.delete(id);
-      }
-      saveData();
-      renderCalendar();
-      if(selectedDay) showEvents(selectedDay.y, selectedDay.m, selectedDay.d);
-    };
-  });
-  
-  document.querySelectorAll('.class-color').forEach(color => color.onclick = e => {
-    e.stopPropagation();
-    const id = color.closest('.class-item').dataset.id;
-    const picker = document.createElement('div');
-    picker.className = 'custom-color-picker';
-    colors.forEach(c => { let opt = document.createElement('div'); opt.className = 'color-option'; opt.style.background = c; opt.onclick = () => { classes.get(id).color = c; saveData(); renderClasses(); renderCalendar(); picker.remove(); }; picker.appendChild(opt); });
-    let custom = document.createElement('div'); custom.className = 'custom-color-option'; custom.innerText = 'Custom...'; custom.onclick = () => { let input = document.createElement('input'); input.type = 'color'; input.value = classes.get(id).color; input.onchange = e2 => { classes.get(id).color = e2.target.value; saveData(); renderClasses(); renderCalendar(); input.remove(); }; input.click(); picker.remove(); }; picker.appendChild(custom);
-    const rect = color.getBoundingClientRect();
-    picker.style.cssText = `position:fixed;top:${rect.bottom+5}px;left:${rect.left}px;z-index:10000`;
-    document.body.appendChild(picker);
-    setTimeout(() => document.addEventListener('click', function close(e) { if(!picker.contains(e.target)) { picker.remove(); document.removeEventListener('click', close); } }), 0);
-  });
-  
-  document.querySelectorAll('.class-edit-btn').forEach(btn => btn.onclick = (e) => {
-    e.stopPropagation();
-    openClassModal(classes.get(btn.closest('.class-item').dataset.id));
-  });
-  
-  document.querySelectorAll('.class-delete-btn').forEach(btn => btn.onclick = (e) => {
-    e.stopPropagation();
-    if(confirm('Delete class and all its events?')) { 
-      const id = btn.closest('.class-item').dataset.id; 
-      classes.delete(id); 
-      activeFilters.delete(id); 
-      for(let [k,v] of events) events.set(k, v.filter(e => e.classId !== id)); 
-      saveData(); 
-      renderClasses(); 
-      renderCalendar(); 
-      if(selectedDay) showEvents(selectedDay.y, selectedDay.m, selectedDay.d); 
-    }
-  });
-  
-  document.querySelectorAll('.class-item').forEach(item => {
-    item.onclick = (e) => {
-      if(!e.target.classList.contains('class-checkbox') && 
-         !e.target.classList.contains('class-color') && 
-         !e.target.classList.contains('class-edit-btn') && 
-         !e.target.classList.contains('class-delete-btn')) {
-        let cb = item.querySelector('.class-checkbox');
-        cb.checked = !cb.checked;
-        const id = item.dataset.id;
-        if(cb.checked) {
-          activeFilters.add(id);
+    let daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+    let firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
+    
+    let monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    document.getElementById("month-year").innerHTML = monthNames[currentMonth] + " " + currentYear;
+    
+    let html = "";
+    html += '<div class="day-header">Sun</div>';
+    html += '<div class="day-header">Mon</div>';
+    html += '<div class="day-header">Tue</div>';
+    html += '<div class="day-header">Wed</div>';
+    html += '<div class="day-header">Thu</div>';
+    html += '<div class="day-header">Fri</div>';
+    html += '<div class="day-header">Sat</div>';
+    
+    let dayCounter = 1;
+    for (let i = 0; i < 42; i++) {
+        if (i < firstDayOfMonth || dayCounter > daysInMonth) { 
+            html += '<div class="day-cell empty"></div>';
         } else {
-          activeFilters.delete(id);
+            let dateStr = formatDate(currentYear, currentMonth, dayCounter);
+            let dayEvents = getEventsForDate(dateStr);
+            let visibleEvents = filterEventsByClass(dayEvents);
+            
+            let eventsHtml = "";
+            if (visibleEvents.length > 0) {
+                eventsHtml = '<div class="events">';
+                let maxToShow = Math.min(visibleEvents.length, 2);
+                for (let e = 0; e < maxToShow; e++) {
+                    let event = visibleEvents[e];
+                    let completedClass = event.completed ? "completed" : "";
+                    let classInfo = getClassInfo(event.classId);
+                    eventsHtml += '<div class="event-tag ' + completedClass + '" style="border-left:3px solid ' + classInfo.color + '">' + event.title + '</div>';
+                }
+                if (visibleEvents.length > 2) {
+                    eventsHtml += '<div class="event-tag">+' + (visibleEvents.length - 2) + ' more</div>';
+                }
+                eventsHtml += '</div>';
+            }
+            
+            let isSelected = (selectedYear === currentYear && selectedMonth === currentMonth && selectedDay === dayCounter);
+            let selectedClass = isSelected ? "selected-day" : "";
+            
+            html += '<div class="day-cell ' + selectedClass + '" data-year="' + currentYear + '" data-month="' + currentMonth + '" data-day="' + dayCounter + '">';
+            html += '<div class="day-number">' + dayCounter + '</div>';
+            html += eventsHtml;
+            html += '</div>';
+            
+            dayCounter++;
         }
-        saveData();
-        renderCalendar();
-        if(selectedDay) showEvents(selectedDay.y, selectedDay.m, selectedDay.d);
-      }
-    };
-  });
+    }
+    
+    document.getElementById("calendarGrid").innerHTML = html;
+    
+    let dayCells = document.querySelectorAll(".day-cell:not(.empty)");
+    for (let i = 0; i < dayCells.length; i++) {
+        dayCells[i].onclick = function() {
+            let year = parseInt(this.getAttribute("data-year"));
+            let month = parseInt(this.getAttribute("data-month"));
+            let day = parseInt(this.getAttribute("data-day"));
+            selectDay(year, month, day);
+        };
+    }
 }
 
-function openEventModal(event=null, dateKey=null) {
-  const modal = document.getElementById('eventModal');
-  document.getElementById('eventModalTitle').innerText = event ? 'Edit Event' : 'Add Event';
-  document.getElementById('eventTitle').value = event?.title || '';
-  document.getElementById('eventType').value = event?.type || 'Assignment';
-  document.getElementById('eventTime').value = event?.time || '';
-  document.getElementById('eventNote').value = event?.note || '';
-  document.getElementById('eventClass').innerHTML = `<option value="">-- No Class --</option>${[...classes.values()].map(c => `<option value="${c.id}" ${event?.classId===c.id ? 'selected' : ''}>${escape(c.name)}</option>`).join('')}`;
-  editingEvent = { event, dateKey };
-  modal.style.display = 'block';
+function selectDay(year, month, day) {
+    selectedYear = year;
+    selectedMonth = month;
+    selectedDay = day;
+    renderCalendar();
+    showEventsForDay(year, month, day);
 }
 
-function closeEventModal() { document.getElementById('eventModal').style.display = 'none'; editingEvent = null; }
-
-function openClassModal(cls=null) {
-  const modal = document.getElementById('classModal');
-  document.getElementById('classModalTitle').innerText = cls ? 'Edit Class' : 'Add Class';
-  document.getElementById('className').value = cls?.name || '';
-  document.getElementById('classColor').value = cls?.color || colors[0];
-  document.getElementById('colorSample').style.background = cls?.color || colors[0];
-  editingClass = cls;
-  modal.style.display = 'block';
+function showEventsForDay(year, month, day) {
+    let dateStr = formatDate(year, month, day);
+    let dayEvents = getEventsForDate(dateStr);
+    let visibleEvents = filterEventsByClass(dayEvents);
+    
+    let dateObj = new Date(year, month, day);
+    let options = { weekday: "long", month: "long", day: "numeric" };
+    document.getElementById("selectedDate").innerHTML = dateObj.toLocaleDateString("en-US", options);
+    
+    let eventsList = document.getElementById("eventsList");
+    if (visibleEvents.length === 0) {
+        eventsList.innerHTML = '<div class="no-events">No events for this day</div>';
+        return;
+    }
+    
+    let html = "";
+    for (let i = 0; i < visibleEvents.length; i++) {
+        let e = visibleEvents[i];
+        let classInfo = getClassInfo(e.classId);
+        let checkedAttr = e.completed ? "checked" : "";
+        let strikeStyle = e.completed ? 'style="text-decoration: line-through; opacity: 0.6;"' : "";
+        
+        html += '<div class="event-card" style="border-left:4px solid ' + classInfo.color + '">';
+        html += '<div class="event-content">';
+        html += '<div class="event-header">';
+        html += '<input type="checkbox" class="event-checkbox" data-id="' + e.id + '" ' + checkedAttr + '>';
+        html += '<h4 ' + strikeStyle + '>' + e.title + '</h4>';
+        html += '<span class="event-type">' + e.type + '</span>';
+        html += '</div>';
+        html += '<div class="event-details">' + e.time + '</div>';
+        html += '<div class="event-note">' + e.note + '</div>';
+        html += '<div class="event-note" style="color:' + classInfo.color + '">' + classInfo.name + '</div>';
+        html += '</div>';
+        html += '<div class="event-actions">';
+        html += '<button class="action-btn edit-event" data-id="' + e.id + '">Edit</button>';
+        html += '<button class="action-btn delete-event" data-id="' + e.id + '">Del</button>';
+        html += '</div>';
+        html += '</div>';
+    }
+    
+    eventsList.innerHTML = html;
+    
+    let checkboxes = document.querySelectorAll(".event-checkbox");
+    for (let i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].onchange = function() {
+            let eventId = this.getAttribute("data-id");
+            toggleEventComplete(eventId, this.checked);
+        };
+    }
+    
+    let editBtns = document.querySelectorAll(".edit-event");
+    for (let i = 0; i < editBtns.length; i++) {
+        editBtns[i].onclick = function() {
+            let eventId = this.getAttribute("data-id");
+            openEventModal(eventId);
+        };
+    }
+    
+    let deleteBtns = document.querySelectorAll(".delete-event");
+    for (let i = 0; i < deleteBtns.length; i++) {
+        deleteBtns[i].onclick = function() {
+            let eventId = this.getAttribute("data-id");
+            if (confirm("Delete this event?")) {
+                deleteEventById(eventId);
+                showEventsForDay(selectedYear, selectedMonth, selectedDay);
+                renderCalendar();
+            }
+        };
+    }
 }
 
-function closeClassModal() { document.getElementById('classModal').style.display = 'none'; editingClass = null; }
+function toggleEventComplete(eventId, isChecked) {
+    for (let i = 0; i < events.length; i++) {
+        if (events[i].id === eventId) {
+            events[i].completed = isChecked;
+            break;
+        }
+    }
+    renderCalendar();
+    showEventsForDay(selectedYear, selectedMonth, selectedDay);
+}
 
-document.getElementById('eventForm').onsubmit = e => {
-  e.preventDefault();
-  const title = document.getElementById('eventTitle').value.trim();
-  if(!title) return alert('Enter title');
-  const type = document.getElementById('eventType').value;
-  const time = document.getElementById('eventTime').value.trim() || 'All day';
-  const note = document.getElementById('eventNote').value.trim();
-  const classId = document.getElementById('eventClass').value || null;
-  
-  if(editingEvent?.event) {
-    const dayEvents = events.get(editingEvent.dateKey);
-    const idx = dayEvents.findIndex(ev => ev.id === editingEvent.event.id);
-    if(idx !== -1) dayEvents[idx] = { ...dayEvents[idx], title, type, time, note, classId };
-  } else {
-    let y = selectedDay?.y, m = selectedDay?.m, d = selectedDay?.d;
-    if(!y) { const today = new Date(); y = today.getFullYear(); m = today.getMonth(); d = today.getDate(); }
-    const dateKey = formatDate(y, m, d);
-    if(!events.has(dateKey)) events.set(dateKey, []);
-    events.get(dateKey).push({ id: crypto.randomUUID(), title, type, time, note, classId, completed: false });
-  }
-  saveData(); closeEventModal(); renderCalendar();
-  if(selectedDay) showEvents(selectedDay.y, selectedDay.m, selectedDay.d);
-};
+function deleteEventById(eventId) {
+    let newEvents = [];
+    for (let i = 0; i < events.length; i++) {
+        if (events[i].id !== eventId) {
+            newEvents.push(events[i]);
+        }
+    }
+    events = newEvents;
+}
 
-document.getElementById('classForm').onsubmit = e => {
-  e.preventDefault();
-  const name = document.getElementById('className').value.trim();
-  if(!name) return alert('Enter class name');
-  const color = document.getElementById('classColor').value;
-  if(editingClass) { editingClass.name = name; editingClass.color = color; }
-  else { const id = 'c'+Date.now(); classes.set(id, { id, name, color }); activeFilters.add(id); }
-  saveData(); closeClassModal(); renderClasses(); renderCalendar();
-};
+function openEventModal(eventId = null) {
+    let modal = document.getElementById("eventModal");
+    let title = document.getElementById("eventModalTitle");
+    let classSelect = document.getElementById("eventClass");
+    
+    classSelect.innerHTML = '<option value="">-- No Class --</option>';
+    for (let i = 0; i < classes.length; i++) {
+        classSelect.innerHTML += '<option value="' + classes[i].id + '">' + classes[i].name + '</option>';
+    }
+    
+    if (eventId) {
+        title.innerHTML = "Edit Event";
+        editingEventId = eventId;
+        
+        let eventToEdit = null;
+        for (let i = 0; i < events.length; i++) {
+            if (events[i].id === eventId) {
+                eventToEdit = events[i];
+                editingEventDate = eventToEdit.date;
+                break;
+            }
+        }
+        
+        if (eventToEdit) {
+            document.getElementById("eventTitle").value = eventToEdit.title;
+            document.getElementById("eventType").value = eventToEdit.type;
+            document.getElementById("eventNote").value = eventToEdit.note;
+            document.getElementById("eventClass").value = eventToEdit.classId || "";
+            
+            let timeStr = eventToEdit.time;
+            if (timeStr === "All day") {
+                document.getElementById("eventStartHour").value = "";
+                document.getElementById("eventStartMinute").value = "";
+                document.getElementById("eventEndHour").value = "";
+                document.getElementById("eventEndMinute").value = "";
+                document.getElementById("noEndTime").checked = true;
+            } else if (timeStr.includes(" - ")) {
+                let parts = timeStr.split(" - ");
+                let startParts = parts[0].match(/(\d+):(\d+)\s+(AM|PM)/);
+                let endParts = parts[1].match(/(\d+):(\d+)\s+(AM|PM)/);
+                
+                if (startParts) {
+                    document.getElementById("eventStartHour").value = startParts[1];
+                    document.getElementById("eventStartMinute").value = startParts[2];
+                    document.getElementById("eventStartAmPm").value = startParts[3];
+                }
+                if (endParts) {
+                    document.getElementById("eventEndHour").value = endParts[1];
+                    document.getElementById("eventEndMinute").value = endParts[2];
+                    document.getElementById("eventEndAmPm").value = endParts[3];
+                    document.getElementById("noEndTime").checked = false;
+                }
+            } else {
+                let parts = timeStr.match(/(\d+):(\d+)\s+(AM|PM)/);
+                if (parts) {
+                    document.getElementById("eventStartHour").value = parts[1];
+                    document.getElementById("eventStartMinute").value = parts[2];
+                    document.getElementById("eventStartAmPm").value = parts[3];
+                    document.getElementById("eventEndHour").value = "";
+                    document.getElementById("eventEndMinute").value = "";
+                    document.getElementById("noEndTime").checked = true;
+                }
+            }
+        }
+    } else {
+        title.innerHTML = "Add Event";
+        editingEventId = null;
+        editingEventDate = null;
+        document.getElementById("eventForm").reset();
+        document.getElementById("eventType").value = "Assignment";
+        document.getElementById("noEndTime").checked = false;
+    }
+    
+    modal.style.display = "block";
+}
 
-document.getElementById('prevMonth').onclick = () => { currentDate.setMonth(currentDate.getMonth()-1); renderCalendar(); };
-document.getElementById('nextMonth').onclick = () => { currentDate.setMonth(currentDate.getMonth()+1); renderCalendar(); };
-document.getElementById('todayBtn').onclick = () => { 
-  currentDate = new Date(); 
-  renderCalendar(); 
-  const today = new Date();
-  selectDay(today.getFullYear(), today.getMonth(), today.getDate());
-};
-document.getElementById('addEventBtn').onclick = () => openEventModal();
-document.getElementById('addClassBtn').onclick = () => openClassModal();
-document.getElementById('selectAllBtn').onclick = () => { activeFilters.clear(); classes.forEach((_,id)=>activeFilters.add(id)); saveData(); renderClasses(); renderCalendar(); if(selectedDay) showEvents(selectedDay.y, selectedDay.m, selectedDay.d); };
-document.getElementById('clearAllBtn').onclick = () => { activeFilters.clear(); saveData(); renderClasses(); renderCalendar(); if(selectedDay) showEvents(selectedDay.y, selectedDay.m, selectedDay.d); };
+function saveEvent(e) {
+    e.preventDefault();
+    
+    let title = document.getElementById("eventTitle").value.trim();
+    if (!title) return;
+    
+    let type = document.getElementById("eventType").value;
+    let note = document.getElementById("eventNote").value;
+    let classId = document.getElementById("eventClass").value || null;
+    
+    let startHour = document.getElementById("eventStartHour").value;
+    let startMinute = document.getElementById("eventStartMinute").value;
+    let startAmPm = document.getElementById("eventStartAmPm").value;
+    let endHour = document.getElementById("eventEndHour").value;
+    let endMinute = document.getElementById("eventEndMinute").value;
+    let endAmPm = document.getElementById("eventEndAmPm").value;
+    let noEndTime = document.getElementById("noEndTime").checked;
+    
+    let time = "";
+    if (!startHour || !startMinute) {
+        time = "All day";
+    } else {
+        let startTime = startHour + ":" + startMinute + " " + startAmPm;
+        if (noEndTime || !endHour || !endMinute) {
+            time = startTime;
+        } else {
+            let endTime = endHour + ":" + endMinute + " " + endAmPm;
+            time = startTime + " - " + endTime;
+        }
+    }
+    
+    if (editingEventId) {
+        for (let i = 0; i < events.length; i++) {
+            if (events[i].id === editingEventId) {
+                events[i].title = title;
+                events[i].type = type;
+                events[i].time = time;
+                events[i].note = note;
+                events[i].classId = classId;
+                break;
+            }
+        }
+    } else {
+        let year = selectedYear;
+        let month = selectedMonth;
+        let day = selectedDay;
+        if (!year) {
+            let today = new Date();
+            year = today.getFullYear();
+            month = today.getMonth();
+            day = today.getDate();
+        }
+        
+        let dateStr = formatDate(year, month, day);
+        let newEvent = {
+            id: Date.now() + "-" + Math.random(),
+            date: dateStr,
+            title: title,
+            type: type,
+            time: time,
+            note: note,
+            classId: classId,
+            completed: false
+        };
+        events.push(newEvent);
+    }
+    
+    document.getElementById("eventModal").style.display = "none";
+    editingEventId = null;
+    
+    renderCalendar();
+    if (selectedYear !== null) {
+        showEventsForDay(selectedYear, selectedMonth, selectedDay);
+    }
+}
 
-document.querySelectorAll('.close-btn, #cancelEventBtn, #cancelClassBtn').forEach(btn => btn.onclick = () => { closeEventModal(); closeClassModal(); });
-window.onclick = e => { if(e.target.classList.contains('modal')) { closeEventModal(); closeClassModal(); } };
+function openClassModal(classId = null) {
+    let modal = document.getElementById("classModal");
+    let title = document.getElementById("classModalTitle");
+    
+    if (classId) {
+        title.innerHTML = "Edit Class";
+        editingClassId = classId;
+        
+        let classToEdit = null;
+        for (let i = 0; i < classes.length; i++) {
+            if (classes[i].id === classId) {
+                classToEdit = classes[i];
+                break;
+            }
+        }
+        
+        if (classToEdit) {
+            document.getElementById("className").value = classToEdit.name;
+            document.getElementById("classColor").value = classToEdit.color;
+            document.getElementById("colorSample").style.background = classToEdit.color;
+        }
+    } else {
+        title.innerHTML = "Add Class";
+        editingClassId = null;
+        document.getElementById("className").value = "";
+        document.getElementById("classColor").value = "#3b82f6";
+        document.getElementById("colorSample").style.background = "#3b82f6";
+    }
+    
+    modal.style.display = "block";
+}
 
-document.getElementById('classColor').oninput = e => document.getElementById('colorSample').style.background = e.target.value;
+function saveClass(e) {
+    e.preventDefault();
+    
+    let name = document.getElementById("className").value.trim();
+    if (!name) return;
+    
+    let color = document.getElementById("classColor").value;
+    
+    if (editingClassId) {
+        for (let i = 0; i < classes.length; i++) {
+            if (classes[i].id === editingClassId) {
+                classes[i].name = name;
+                classes[i].color = color;
+                break;
+            }
+        }
+    } else {
+        let newId = "class_" + Date.now();
+        let newClass = {
+            id: newId,
+            name: name,
+            color: color
+        };
+        classes.push(newClass);
+        activeClassFilters.push(newId);
+    }
+    
+    document.getElementById("classModal").style.display = "none";
+    editingClassId = null;
+    renderClassList();
+    renderCalendar();
+    if (selectedYear !== null) {
+        showEventsForDay(selectedYear, selectedMonth, selectedDay);
+    }
+}
 
-loadData();
-renderClasses();
-currentDate = new Date();
-renderCalendar();
-setTimeout(() => {
-  const today = new Date();
-  selectDay(today.getFullYear(), today.getMonth(), today.getDate());
-}, 100);
+function renderClassList() {
+    let html = "";
+    for (let i = 0; i < classes.length; i++) {
+        let c = classes[i];
+        let isChecked = isClassFilterActive(c.id) ? "checked" : "";
+        html += '<div class="class-item" data-id="' + c.id + '">';
+        html += '<input type="checkbox" class="class-checkbox" ' + isChecked + '>';
+        html += '<span class="class-name" title="' + c.name + '">' + c.name + '</span>';
+        html += '<div class="class-actions">';
+        html += '<div class="class-color" style="background:' + c.color + '"></div>';
+        html += '<button class="class-edit-btn" data-id="' + c.id + '">✏️</button>';
+        html += '<button class="class-delete-btn" data-id="' + c.id + '">🗑️</button>';
+        html += '</div>';
+        html += '</div>';
+    }
+    
+    document.getElementById("classesList").innerHTML = html;
+    
+    let checkboxes = document.querySelectorAll(".class-checkbox");
+    for (let i = 0; i < checkboxes.length; i++) {
+        checkboxes[i].onclick = function(e) {
+            e.stopPropagation();
+            let classItem = this.closest(".class-item");
+            let classId = classItem.getAttribute("data-id");
+            
+            if (this.checked) {
+                activeClassFilters.push(classId);
+            } else {
+                let newFilters = [];
+                for (let f = 0; f < activeClassFilters.length; f++) {
+                    if (activeClassFilters[f] !== classId) {
+                        newFilters.push(activeClassFilters[f]);
+                    }
+                }
+                activeClassFilters = newFilters;
+            }
+            
+            renderCalendar();
+            if (selectedYear !== null) {
+                showEventsForDay(selectedYear, selectedMonth, selectedDay);
+            }
+        };
+    }
+    
+    let editBtns = document.querySelectorAll(".class-edit-btn");
+    for (let i = 0; i < editBtns.length; i++) {
+        editBtns[i].onclick = function(e) {
+            e.stopPropagation();
+            let classId = this.getAttribute("data-id");
+            openClassModal(classId);
+        };
+    }
+    
+    let deleteBtns = document.querySelectorAll(".class-delete-btn");
+    for (let i = 0; i < deleteBtns.length; i++) {
+        deleteBtns[i].onclick = function(e) {
+            e.stopPropagation();
+            if (confirm("Delete this class? All events in this class will also be deleted.")) {
+                let classId = this.getAttribute("data-id");
+                
+                let newClasses = [];
+                for (let c = 0; c < classes.length; c++) {
+                    if (classes[c].id !== classId) {
+                        newClasses.push(classes[c]);
+                    }
+                }
+                classes = newClasses;
+                
+                let newFilters = [];
+                for (let f = 0; f < activeClassFilters.length; f++) {
+                    if (activeClassFilters[f] !== classId) {
+                        newFilters.push(activeClassFilters[f]);
+                    }
+                }
+                activeClassFilters = newFilters;
+                
+                let newEvents = [];
+                for (let ev = 0; ev < events.length; ev++) {
+                    if (events[ev].classId !== classId) {
+                        newEvents.push(events[ev]);
+                    }
+                }
+                events = newEvents;
+                
+                renderClassList();
+                renderCalendar();
+                if (selectedYear !== null) {
+                    showEventsForDay(selectedYear, selectedMonth, selectedDay);
+                }
+            }
+        };
+    }
+    
+    let classItems = document.querySelectorAll(".class-item");
+    for (let i = 0; i < classItems.length; i++) {
+        classItems[i].onclick = function(e) {
+            if (e.target.type !== "checkbox" && !e.target.classList.contains("class-edit-btn") && !e.target.classList.contains("class-delete-btn") && !e.target.classList.contains("class-color")) {
+                let cb = this.querySelector(".class-checkbox");
+                cb.checked = !cb.checked;
+                let clickEvent = new Event("click");
+                cb.dispatchEvent(clickEvent);
+            }
+        };
+    }
+}
+
+function goPrevMonth() {
+    currentMonth--;
+    if (currentMonth < 0) {
+        currentMonth = 11;
+        currentYear--;
+    }
+    renderCalendar();
+}
+
+function goNextMonth() {
+    currentMonth++;
+    if (currentMonth > 11) {
+        currentMonth = 0;
+        currentYear++;
+    }
+    renderCalendar();
+}
+
+function goToToday() {
+    let today = new Date();
+    currentYear = today.getFullYear();
+    currentMonth = today.getMonth();
+    renderCalendar();
+    selectDay(today.getFullYear(), today.getMonth(), today.getDate());
+}
+
+function selectAllClasses() {
+    activeClassFilters = [];
+    for (let i = 0; i < classes.length; i++) {
+        activeClassFilters.push(classes[i].id);
+    }
+    renderClassList();
+    renderCalendar();
+    if (selectedYear !== null) {
+        showEventsForDay(selectedYear, selectedMonth, selectedDay);
+    }
+}
+
+function clearAllClasses() {
+    activeClassFilters = [];
+    renderClassList();
+    renderCalendar();
+    if (selectedYear !== null) {
+        showEventsForDay(selectedYear, selectedMonth, selectedDay);
+    }
+}
+
+function setupButtons() {
+    document.getElementById("prevMonth").onclick = goPrevMonth;
+    document.getElementById("nextMonth").onclick = goNextMonth;
+    document.getElementById("todayBtn").onclick = goToToday;
+    document.getElementById("addEventBtn").onclick = function() { openEventModal(); };
+    document.getElementById("addClassBtn").onclick = function() { openClassModal(); };
+    document.getElementById("selectAllBtn").onclick = selectAllClasses;
+    document.getElementById("clearAllBtn").onclick = clearAllClasses;
+}
+
+startCalendar();
