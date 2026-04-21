@@ -1,3 +1,5 @@
+-- Do not use --
+
 create database Calander;
 
 use Calander;
