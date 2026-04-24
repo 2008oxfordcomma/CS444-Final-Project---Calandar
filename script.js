@@ -1,4 +1,4 @@
-// disclaimer: ai was only consulted to write the popup aspect of the forms (the modal opening closing and form resetting).
+// disclaimer: ai was only consulted to fixing the popup aspect of the forms (the modal opening closing and form resetting).
 
 let events = [];
 let classes = [];
@@ -13,6 +13,11 @@ let editingEventDate = null;
 let editingClassId = null;
 
 function startCalendar() {
+    let savedData = loadData();
+    if (!savedData) { // we'll leave this in since we have to do an in class demonstration
+        loadSampleData();
+    }
+
     renderClassList();
     renderCalendar();
     
@@ -21,6 +26,43 @@ function startCalendar() {
     
     setupModals();
     setupButtons();
+}
+
+function saveData() {
+    let dataToSave = {
+        events: events,
+        classes: classes,
+        activeClassFilters: activeClassFilters
+    };
+    localStorage.setItem("calendarData", JSON.stringify(dataToSave));
+}
+
+function loadData() {
+    let savedData = localStorage.getItem("calendarData");
+    if (savedData) {
+        let data = JSON.parse(savedData);
+        events = data.events || [];
+        classes = data.classes || [];
+        activeClassFilters = data.activeClassFilters || [];
+        return true;
+    }
+    return false;
+}
+
+function loadSampleData() {
+    classes = [
+        { id: "cs444", name: "CS 444 - HCI", color: "#3b82f6" },
+        { id: "psy335", name: "PSY 335 - Psychology", color: "#10b981" },
+        { id: "cs375", name: "CS 375 - Computer Systems", color: "#f59e0b" },
+        { id: "cs366", name: "CS 366 - Systems Programming", color: "#ef4444" }
+    ];
+    
+    activeClassFilters = [];
+    for (let i = 0; i < classes.length; i++) {
+        activeClassFilters.push(classes[i].id);
+    }
+    
+    events = [];
 }
 
 function setupModals() {
@@ -259,6 +301,7 @@ function toggleEventComplete(eventId, isChecked) {
             break;
         }
     }
+    saveData();
     renderCalendar();
     showEventsForDay(selectedYear, selectedMonth, selectedDay);
 }
@@ -271,6 +314,7 @@ function deleteEventById(eventId) {
         }
     }
     events = newEvents;
+    saveData();
 }
 
 function openEventModal(eventId = null) {
@@ -415,6 +459,8 @@ function saveEvent(e) {
         };
         events.push(newEvent);
     }
+
+    saveData();
     
     document.getElementById("eventModal").style.display = "none";
     editingEventId = null;
@@ -423,6 +469,7 @@ function saveEvent(e) {
     if (selectedYear !== null) {
         showEventsForDay(selectedYear, selectedMonth, selectedDay);
     }
+
 }
 
 function openClassModal(classId = null) {
@@ -483,6 +530,8 @@ function saveClass(e) {
         classes.push(newClass);
         activeClassFilters.push(newId);
     }
+
+    saveData();
     
     document.getElementById("classModal").style.display = "none";
     editingClassId = null;
@@ -576,7 +625,7 @@ function renderClassList() {
                     }
                 }
                 events = newEvents;
-                
+                saveData();
                 renderClassList();
                 renderCalendar();
                 if (selectedYear !== null) {
@@ -630,6 +679,7 @@ function selectAllClasses() {
     for (let i = 0; i < classes.length; i++) {
         activeClassFilters.push(classes[i].id);
     }
+    saveData();
     renderClassList();
     renderCalendar();
     if (selectedYear !== null) {
@@ -639,6 +689,7 @@ function selectAllClasses() {
 
 function clearAllClasses() {
     activeClassFilters = [];
+    saveData();
     renderClassList();
     renderCalendar();
     if (selectedYear !== null) {
