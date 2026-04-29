@@ -20,8 +20,7 @@
                     </div>
                     <div class="nav-buttons">
                         <button onclick="window.location.href='calendar.html'" class="nav-btn active">Calendar</button>
-                        <!--<button onclick="window.location.href='today.html'" class="nav-btn">Today</button>
-                        <button onclick="window.location.href='assignments.html'" class="nav-btn">Assignments</button>-->
+                        <button id="settingsBtn" class="nav-btn active">Settings</button>
                         <button onclick="window.location.href='index.html'" class="nav-btn active">Logout</button>
                     </div>
                 </div>
@@ -114,9 +113,11 @@
                                 <select id="eventStartMinute">
                                     <option value="">Min</option>
                                     <option value="00">00</option>
-                                    <option value="15">15</option>
-                                    <option value="30">30</option>
-                                    <option value="45">45</option>
+                                    <option value="00">10</option>
+                                    <option value="00">20</option>
+                                    <option value="00">30</option>
+                                    <option value="00">40</option>
+                                    <option value="15">50</option>
                                 </select>
                                 <select id="eventStartAmPm">
                                     <option value="AM">AM</option>
@@ -143,9 +144,11 @@
                                 <select id="eventEndMinute">
                                     <option value="">Min</option>
                                     <option value="00">00</option>
-                                    <option value="15">15</option>
-                                    <option value="30">30</option>
-                                    <option value="45">45</option>
+                                    <option value="00">10</option>
+                                    <option value="00">20</option>
+                                    <option value="00">30</option>
+                                    <option value="00">40</option>
+                                    <option value="15">50</option>
                                 </select>
                                 <select id="eventEndAmPm">
                                     <option value="AM">AM</option>
@@ -198,6 +201,26 @@
                         <button type="submit" class="submit-btn">Save Class</button>
                     </div>
                 </form>
+            </div>
+        </div>
+        <div id="settingsModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Settings</h3>
+                    <span class="close-btn" id="closeSettingsBtn">&times;</span>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="themeSelect">Theme</label>
+                        <select id="themeSelect" class="theme-select">
+                            <option value="light">Light Mode</option>
+                            <option value="dark">Dark Mode</option>
+                            <option value="highContrast">High Contrast</option>
+                        </select>
+                    </div>
+                    
+                </div>
+                
             </div>
         </div>
         <script src="script.js"></script>
