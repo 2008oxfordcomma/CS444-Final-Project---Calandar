@@ -2,21 +2,106 @@
                               2) make needed changes based on my initial code to fit different media sizes, 
                               3) to convert most of the initial px values from the prototype wireframe to rem units. 
    I did run the css through https://www.codebeautifier.com/ to consolidate similar styles */
+
+   :root {
+    --bg-body: white;
+    --bg-main: #f9fafb;
+    --bg-card: white;
+    --text-primary: #1f2937;
+    --text-secondary: #4b5563;
+    --text-muted: #6b7280;
+    --border-color: #1f2937;
+    --border-light: #e5e7eb;
+    --header-bg: #f3f4f6;
+    --event-bg: #e5e7eb;
+    --event-border: #4b5563;
+    --event-completed: #d1d5db;
+    --empty-cell: #dee2e4;
+    --selected-day: #818181;
+    --selected-event: #484949;
+    --btn-primary: #1f2937;
+    --btn-hover: #36475f;
+    --btn-success: #10b981;
+    --btn-danger: #ef4444;
+    --btn-info: #3b82f6;
+    --modal-header: #f9fafb;
+    --input-border: #d1d5db;
+    --event-text: #4b5563;
+    --bg-hover: white;
+    --scrollbar-track: #f1f1f1;
+    --scrollbar-thumb: #888;
+    --selected-event-text: white;
+}
+
+[data-theme="dark"] {
+    --bg-body: #1a1a2e;
+    --bg-main: #16213e;
+    --bg-card: #0f3460;
+    --text-primary: #e2e8f0;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --border-color: #475569;
+    --border-light: #334155;
+    --header-bg: #1e293b;
+    --event-bg: #334155;
+    --event-border: #64748b;
+    --event-completed: #475569;
+    --empty-cell: #1e293b;
+    --selected-day: #475569;
+    --selected-event: #64748b;
+    --btn-primary: #697c97;
+    --btn-hover: #4d596b;
+    --modal-header: #1e293b;
+    --input-border: #475569;
+    --scrollbar-track: #1e293b;
+    --scrollbar-thumb: #475569;
+    --selected-event-text: #e2e8f0;
+}
+
+[data-theme="highContrast"] {
+    --bg-body: #000000;
+    --bg-main: #000000;
+    --bg-card: #000000;
+    --text-primary: #ffffff;
+    --text-secondary: #ffff00;
+    --text-muted: #00ff00;
+    --border-color: #ffffff;
+    --border-light: #ffff00;
+    --header-bg: #000000;
+    --event-bg: #000000;
+    --event-border: #ffffff;
+    --event-completed: #333333;
+    --empty-cell: #111111;
+    --selected-day: #ffff00;
+    --selected-event: #009100;
+    --btn-primary: #000000;
+    --btn-hover: #ffff00;
+    --modal-header: #000000;
+    --input-border: #ffffff;
+    --event-text: #000000;
+    --scrollbar-track: #333333;
+    --scrollbar-thumb: #ffffff;
+    --event-text: #ffffff;
+    --bg-hover: #ffff00;
+    --selected-event-text: #000000;
+}
+
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 body {
-  background: white;
+  background: var(--bg-body);
+  color: var(--text-primary);
   font-family: BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 button {
   cursor: pointer;
 }
 .navbar {
-  border-bottom: 2px solid #1f2937;
-  background: white;
+  border-bottom: 2px solid var(--border-color);
+  background: var(--bg-body);
 }
 .container {
   max-width: 1280px;
@@ -48,33 +133,34 @@ button {
 }
 .nav-btn {
   padding: 0.5rem 1rem;
-  border: 2px solid #1f2937;
-  background: white;
+  border: 2px solid var(--border-color);
+  background: var(--btn-primary);
+  color: white;
   font-size: 14px;
   font-weight: 500;
 }
 .nav-btn.active {
-  background: #1f2937;
+  background: var(--btn-primary);
   color: white;
 }
 .nav-btn.active:hover {
-  background: #36475f;
+  background: var(--btn-hover);
 }
 .main-content {
   max-width: 1280px;
   margin: 0 auto;
   padding: 1.5rem;
-  background: #f9fafb;
+  background: var(--bg-main);
   min-height: calc(100vh - 64px);
 }
 .calendar-box {
-  border: 2px solid #1f2937;
-  background: white;
+  border: 2px solid var(--border-color);
+  background: var(--bg-card);
   overflow-x: auto;
 }
 .calendar-header {
   padding: 1rem;
-  border-bottom: 2px solid #1f2937;
+  border-bottom: 2px solid var(--border-color);
   display: flex;
   justify-content: space-between;
   flex-wrap: wrap;
@@ -91,14 +177,14 @@ button {
 }
 .control-btn {
   padding: 0.25rem 0.75rem;
-  border: 2px solid #1f2937;
-  background: #1f2937;
+  border: 2px solid var(--border-color);
+  background: var(--btn-primary);
   color: white;
   font-size: 14px;
   font-weight: 500;
 }
 .control-btn:hover {
-  background: #36475f;
+  background: var(--btn-hover);
 }
 .calendar-body {
   padding: 0.5rem;
@@ -107,42 +193,43 @@ button {
 .calendar-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  border: 2px solid #1f2937;
+  border: 2px solid var(--border-color);
   min-width: 600px;
 }
 .day-header {
-  border: 1px solid #1f2937;
+  border: 1px solid var(--border-color);
   padding: 0.5rem;
   text-align: center;
-  background: #f3f4f6;
+  background: var(--header-bg);
   font-size: 12px;
   font-weight: 600;
+  color: var(--text-primary)
 }
 .day-cell {
-  border: 1px solid #1f2937;
+  border: 1px solid var(--border-color);
   min-height: 80px;
   padding: 0.25rem;
-  background: white;
+  background: var(--bg-card);
   cursor: pointer;
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 .day-cell.empty {
-  background: #dee2e4;
+  background: var(--empty-cell);
   cursor: default;
 }
 .day-cell.selected-day {
-  background: #818181;
+  background: var(--selected-day);
 }
 .day-cell.selected-day .day-number {
-  color: white;
+  color: var(--bg-body);
   font-weight: bold;
 }
 .day-cell.selected-day .event-tag {
-  background: #484949;
-  border-color: #1d1e1f;
-  color: white;
+  background: var(--selected-event);
+  border-color: var(--border-color);
+  color: var(--selected-event-text, white);
 }
 .day-number {
   font-size: 12px;
@@ -159,17 +246,18 @@ button {
 .event-tag {
   font-size: 9px;
   padding: 0.1rem 0.2rem;
-  border: 1px solid #4b5563;
-  background: #e5e7eb;
+  border: 1px solid var(--event-border);
+  background: var(--event-bg);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   display: block;
+  color: var(--text-secondary);
 }
 .event-tag.completed {
   text-decoration: line-through;
-  opacity: 0.6;
-  background: #d1d5db;
+  opacity: 0.7;
+  background: var(--event-completed);
 }
 .right-panel {
   display: flex;
@@ -178,8 +266,8 @@ button {
 }
 .events-box,
 .classes-box {
-  border: 2px solid #1f2937;
-  background: white;
+  border: 2px solid var(--border-color);
+  background: var(--bg-card);
   padding: 1rem;
   display: flex;
   flex-direction: column;
@@ -195,7 +283,7 @@ button {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0.75rem;
-  border-bottom: 2px solid #1f2937;
+  border-bottom: 2px solid var(--border-color);
   padding-bottom: 0.5rem;
   gap: 1rem;
 }
@@ -214,8 +302,8 @@ button {
 .add-event-btn,
 .add-class-btn {
   padding: 0.25rem 0.75rem;
-  border: 2px solid #1f2937;
-  background: #1f2937;
+  border: 2px solid var(--border-color);
+  background: var(--btn-primary);
   color: white;
   font-size: 12px;
   font-weight: 500;
@@ -223,7 +311,7 @@ button {
 .add-event-btn:hover,
 .add-class-btn:hover,
 .filter-btn:hover {
-  background: #36475f;
+  background: var(--btn-hover);
 }
 #eventsList,
 .classes-list {
@@ -237,11 +325,11 @@ button {
 }
 #eventsList::-webkit-scrollbar-track,
 .classes-list::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: var(--scrollbar-track);
 }
 #eventsList::-webkit-scrollbar-thumb,
 .classes-list::-webkit-scrollbar-thumb {
-  background: #888;
+  background: var(--scrollbar-thumb);
 }
 #eventsList::-webkit-scrollbar-thumb:hover,
 .classes-list::-webkit-scrollbar-thumb:hover {
@@ -249,8 +337,8 @@ button {
 }
 .event-card {
   padding: 0.75rem;
-  border: 2px solid #1f2937;
-  background: white;
+  border: 2px solid var(--border-color);
+  background: var(--bg-card);
   margin-bottom: 0.75rem;
   display: flex;
   justify-content: space-between;
@@ -287,21 +375,22 @@ button {
 }
 .event-type {
   padding: 0.125rem 0.5rem;
-  border: 1px solid #4b5563;
-  background: #e5e7eb;
+  border: 1px solid var(--border-color);
+  background: var(--border-light);
+  color: var(--event-text);
   font-size: 10px;
   font-weight: 500;
   white-space: nowrap;
 }
 .event-details {
   font-size: 12px;
-  color: #4b5563;
+  color: var(--text-secondary);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 .event-note {
-  color: #6b7280;
+  color: var(--text-muted);
   font-size: 11px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -313,14 +402,15 @@ button {
 }
 .action-btn {
   padding: 0.25rem 0.5rem;
-  border: 1px solid #4b5563;
-  background: white;
+  border: 1px solid var(--border-color);
+  background: var(--btn-primary);
+  color: white;
   font-size: 10px;
   font-weight: 500;
   height: 28px;
 }
 .action-btn:hover {
-  background: #f3f4f6;
+  background: var(--btn-hover);
 }
 .classes-list {
   gap: 0.5rem;
@@ -332,11 +422,11 @@ button {
   align-items: center;
   gap: 0.5rem;
   padding: 0.5rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid var(--border-light);
   cursor: pointer;
 }
 .class-item:hover {
-  background: #f3f4f6;
+  background: var(--border-light);
 }
 .class-checkbox {
   width: 18px;
@@ -360,40 +450,41 @@ button {
 .class-color {
   width: 22px;
   height: 22px;
-  border: 2px solid #d1d5db;
+  border: 2px solid var(--border-color);
   cursor: pointer;
 }
 .class-color:hover {
   transform: scale(1.1);
-  border-color: #1f2937;
+  border-color: var(--border-color);
 }
 .class-edit-btn,
 .class-delete-btn {
   padding: 0.2rem 0.4rem;
-  border: 1px solid #4b5563;
-  background: white;
+  border: 1px solid var(--border-color);
+  background: var(--btn-primary);
+  color:var(--text-primary);
   font-size: 9px;
   font-weight: 500;
 }
 .class-edit-btn:hover {
-  background: #3b82f6;
+  background: var(--btn-info);
   color: white;
 }
 .class-delete-btn:hover {
-  background: #ef4444;
+  background: var(--btn-danger);
   color: white;
 }
 .filter-actions {
   display: flex;
   gap: 0.5rem;
   padding-top: 0.5rem;
-  border-top: 1px solid #e5e7eb;
+  border-top: 1px solid var(--border-light);
 }
 .filter-btn {
   flex: 1;
   padding: 0.5rem;
-  border: 2px solid #1f2937;
-  background: #1f2937;
+  border: 2px solid var(--border-color);
+  background: var(--btn-primary);
   color: white;
   font-size: 12px;
   font-weight: 500;
@@ -425,7 +516,7 @@ button {
 .time-sep {
   font-size: 14px;
   font-weight: 500;
-  color: #4b5563;
+  color: var(--text-secondary);
 }
 
 .no-end-time {
@@ -443,6 +534,40 @@ button {
   margin: 0;
 }
 
+.preview-color {
+  width: 40px;
+    height: 40px;
+    border: 1px solid var(--border-color);
+}
+
+.preview-colors {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 0.5rem;
+}
+
+.theme-preview {
+    margin-top: 1rem;
+    padding: 1rem;
+    border: 1px solid var(--border-light);
+    text-align: center;
+}
+
+.theme-select {
+    width: 100%;
+    padding: 0.5rem;
+    border: 2px solid var(--input-border);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
 
 /* to be safe and explict, AI was used to adjust and/or generate the modal and form stuff below this line*/
 
@@ -457,9 +582,9 @@ button {
   background: rgba(0, 0, 0, 0.5);
 }
 .modal-content {
-  background: white;
+  background: var(--bg-card);
   margin: 10% auto;
-  border: 2px solid #1f2937;
+  border: 2px solid var(--border-color);
   width: 90%;
   max-width: 500px;
 }
@@ -468,8 +593,8 @@ button {
   justify-content: space-between;
   align-items: center;
   padding: 1rem 1.5rem;
-  border-bottom: 2px solid #1f2937;
-  background: #f9fafb;
+  border-bottom: 2px solid var(--border-color);
+  background: var(--bg-main);
 }
 .modal-header h3 {
   font-size: 18px;
@@ -479,10 +604,10 @@ button {
   font-size: 28px;
   font-weight: bold;
   cursor: pointer;
-  color: #6b7280;
+  color: var(--text-muted);
 }
 .close-btn:hover {
-  color: #1f2937;
+  color: var(--text-primary);
 }
 form {
   padding: 1.5rem;
@@ -499,19 +624,20 @@ form {
 .form-group input,
 .form-group select,
 .form-group textarea {
+  color: var(--text-primary);
   width: 100%;
   resize: vertical;
   padding: 0.5rem;
-  border: 2px solid #d1d5db;
+  border: 2px solid var(--border-color);
   font-size: 14px;
   font-family: inherit;
-  background: white;
+  background: var(--bg-body);
 }
 .form-group input:focus,
 .form-group select:focus,
 .form-group textarea:focus {
   outline: none;
-  border-color: #1f2937;
+  border-color: var(--border-color);
 }
 .form-group input[type="color"] {
   width: 60px;
@@ -528,7 +654,7 @@ form {
 .color-sample {
   width: 24px;
   height: 24px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
 }
 .form-actions {
   display: flex;
@@ -539,23 +665,25 @@ form {
 .cancel-btn,
 .submit-btn {
   padding: 0.5rem 1rem;
-  border: 2px solid #1f2937;
+  border: 2px solid var(--border-color);
   font-size: 14px;
   font-weight: 500;
 }
 .cancel-btn {
-  background: white;
-  color: #1f2937;
+  background: var(--bg-body);
+  color: var(--text-primary);
+  border: 2px solid var(--border-color);
 }
 .cancel-btn:hover {
-  background: #f3f4f6;
+  color: white;
+  background: var(--btn-hover);
 }
 .submit-btn {
-  background: #1f2937;
+  background: var(--btn-primary);
   color: white;
 }
 .submit-btn:hover {
-  background: #374151;
+  background: var(--btn-hover);
 }
 textarea {
   white-space: pre-wrap;
@@ -654,16 +782,7 @@ textarea {
   .calendar-body {
     position: relative;
   }
-  .calendar-body::after {
-    content: "← Swipe to scroll →";
-    display: block;
-    text-align: center;
-    font-size: 10px;
-    color: #6b7280;
-    padding: 0.5rem;
-    background: #f9fafb;
-    margin-top: 0.5rem;
-  }
+  
 }
 @media (max-width: 600px) {
   .container {
