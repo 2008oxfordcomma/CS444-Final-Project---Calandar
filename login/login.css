@@ -1,0 +1,89 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background: white;
+    font-family: BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+
+/* SCREEN */
+body{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 90vh;
+    transform: scale(1.25);
+}
+
+/* MAIN BOX CONTAINS FORM AND SWITCHER */
+
+.main{
+    min-width: 320px;
+}
+
+#switcher{
+    margin-top: 2rem;
+    margin: 1rem;
+    text-align: center;
+}
+
+#switcher:hover{
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* FORM BODY */
+.form{
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    border: 0.25rem solid black;
+    background-color:#BBBBBB;
+}
+
+
+/* FORM HEADER */
+h2{
+    background-color: inherit;
+    font-size: 2.0rem;
+    align-self: center;
+}
+
+/* LOGIN PASSOWRD */
+button{
+    margin: 0.5rem;
+    border-style: none;
+    background-color: #CCCCCC;
+    padding: 0.5rem;
+    font-size: 1rem;
+    border-style: solid;
+    border-color: black;
+}
+
+button:hover{
+    cursor: pointer;
+    background-color: white;
+}
+
+#error{
+    color: #BB3333;
+    text-align: center;
+    margin: 0.25rem;
+    background-color: unset;
+}
+/* INPUT SECTION FOR USERNAME AND PASSWORD */
+input:focus{
+    outline: 2px solid black;
+}
+
+input{
+    width: 100%;
+    padding: 0.15rem;
+}
+
+.username,
+.password{
+    background: unset;
+    margin: 0.5rem;
+}
