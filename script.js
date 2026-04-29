@@ -167,6 +167,12 @@ function renderCalendar() {
     
     let dayCounter = 1;
     for (let i = 0; i < 42; i++) {
+
+        //leaves once unneeded row is completed
+        if(dayCounter > daysInMonth && i % 7 == 0){
+            break;
+        }
+        
         if (i < firstDayOfMonth || dayCounter > daysInMonth) { 
             html += '<div class="day-cell empty"></div>';
         } else {

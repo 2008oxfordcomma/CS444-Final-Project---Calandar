@@ -500,6 +500,7 @@ form {
 .form-group select,
 .form-group textarea {
   width: 100%;
+  resize: vertical;
   padding: 0.5rem;
   border: 2px solid #d1d5db;
   font-size: 14px;
