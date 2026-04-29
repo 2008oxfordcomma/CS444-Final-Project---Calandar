@@ -18,6 +18,8 @@ function startCalendar() {
         loadSampleData();
     }
 
+    loadTheme();
+
     renderClassList();
     renderCalendar();
     
@@ -711,6 +713,53 @@ function setupButtons() {
     document.getElementById("addClassBtn").onclick = function() { openClassModal(); };
     document.getElementById("selectAllBtn").onclick = selectAllClasses;
     document.getElementById("clearAllBtn").onclick = clearAllClasses;
+
+    let settingsBtn = document.getElementById("settingsBtn");
+    if (settingsBtn) settingsBtn.onclick = openSettingsModal;
+    
+    let closeSettingsBtn = document.getElementById("closeSettingsBtn");
+    if (closeSettingsBtn) closeSettingsBtn.onclick = closeSettingsModal;
+    
+    let closeSettingsModalBtn = document.getElementById("closeSettingsModalBtn");
+    if (closeSettingsModalBtn) closeSettingsModalBtn.onclick = closeSettingsModal;
+    
+    let themeSelect = document.getElementById("themeSelect");
+    if (themeSelect) {
+        themeSelect.onchange = function() {
+            applyTheme(this.value);
+        };
+    }
+}
+
+function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('calendarTheme', theme);
+}
+
+function loadTheme() {
+    let savedTheme = localStorage.getItem('calendarTheme');
+    if (savedTheme && savedTheme !== 'light') {
+        applyTheme(savedTheme);
+        document.getElementById('themeSelect').value = savedTheme;
+    } else if (savedTheme === 'highContrast') {
+        applyTheme('highContrast');
+        document.getElementById('themeSelect').value = 'highContrast';
+    } else {
+        applyTheme('light');
+        if (document.getElementById('themeSelect')) {
+            document.getElementById('themeSelect').value = 'light';
+        }
+    }
+}
+
+function openSettingsModal() {
+    let modal = document.getElementById('settingsModal');
+    if (modal) modal.style.display = 'block';
+}
+
+function closeSettingsModal() {
+    let modal = document.getElementById('settingsModal');
+    if (modal) modal.style.display = 'none';
 }
 
 startCalendar();
