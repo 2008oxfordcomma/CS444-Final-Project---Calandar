@@ -14,9 +14,6 @@ let editingClassId = null;
 
 function startCalendar() {
     let savedData = loadData();
-    if (!savedData) { // we'll leave this in since we have to do an in class demonstration
-        loadSampleData();
-    }
 
     loadTheme();
 
@@ -74,19 +71,127 @@ function loadData() {
 }
 
 function loadSampleData() {
-    classes = [
-        { id: "cs444", name: "CS 444 - HCI", color: "#3b82f6" },
-        { id: "psy335", name: "PSY 335 - Psychology", color: "#10b981" },
-        { id: "cs375", name: "CS 375 - Computer Systems", color: "#f59e0b" },
-        { id: "cs366", name: "CS 366 - Systems Programming", color: "#ef4444" }
-    ];
-    
-    activeClassFilters = [];
-    for (let i = 0; i < classes.length; i++) {
-        activeClassFilters.push(classes[i].id);
+    if (confirm("Load sample data? This will overwrite your current calendar data.")) {
+
+        classes = [
+            { id: "cs444", name: "CS 444 - HCI", color: "#3b82f6" },
+            { id: "psy335", name: "PSY 335 - Psychology", color: "#10b981" },
+            { id: "cs375", name: "CS 375 - Computer Systems", color: "#f59e0b" },
+            { id: "cs366", name: "CS 366 - Systems Programming", color: "#ef4444" }
+        ];
+        
+        activeClassFilters = [];
+        for (let i = 0; i < classes.length; i++) {
+            activeClassFilters.push(classes[i].id);
+        }
+        
+        let today = new Date();
+        let year = today.getFullYear();
+        let month = today.getMonth();
+        let day = today.getDate();
+
+        events = [
+            {
+                id: crypto.randomUUID(),
+                date: formatDate(2026, 3, 6),
+                title: "Paper 3",
+                type: "Assignment",
+                time: "11:59 PM",
+                note: "",
+                classId: "psy335",
+                completed: false
+            },
+            {
+                id: crypto.randomUUID(),
+                date: formatDate(2026, 3, 10),
+                title: "HW3",
+                type: "Assignment",
+                time: "11:59 PM",
+                note: "",
+                classId: "cs366",
+                completed: false
+            },
+            {
+                id: crypto.randomUUID(),
+                date: formatDate(2026, 3, 14),
+                title: "Quiz 2",
+                type: "Quiz",
+                time: "4:30 PM - 5:50 PM",
+                note: "Can have 1 sheet of notes",
+                classId: "cs366",
+                completed: false
+            },
+            {
+                id: crypto.randomUUID(),
+                date: formatDate(2026, 3, 22),
+                title: "Lab 12",
+                type: "Assignment",
+                time: "",
+                note: "",
+                classId: "cs366",
+                completed: false
+            },
+            {
+                id: crypto.randomUUID(),
+                date: formatDate(2026, 3, 30),
+                title: "Final Presentation",
+                type: "Discussion",
+                time: "3:00 PM - 4:20 PM",
+                note: "",
+                classId: "cs444",
+                completed: false
+            },
+            {
+                id: crypto.randomUUID(),
+                date: formatDate(2026, 3, 10),
+                title: "Lab 5",
+                type: "Assignment",
+                time: "11:59 PM",
+                note: "",
+                classId: "cs444",
+                completed: false
+            },
+            {
+                id: crypto.randomUUID(),
+                date: formatDate(2026, 3, 30),
+                title: "Final Presentation",
+                type: "Discussion",
+                time: "4:30 PM - 5:50 PM",
+                note: "",
+                classId: "cs366",
+                completed: false
+            },
+            {
+                id: crypto.randomUUID(),
+                date: formatDate(2026, 3, 20),
+                title: "Recursive Exponentiation",
+                type: "Assignment",
+                time: "8:00 AM",
+                note: "",
+                classId: "cs375",
+                completed: false
+            },
+            {
+                id: crypto.randomUUID(),
+                date: formatDate(2026, 3, 10),
+                title: "Family Dinner",
+                type: "Other",
+                time: "8:00 AM",
+                note: "Drive to Rochester",
+                classId: "",
+                completed: false
+            },
+        ];
+
+        saveData();
+        renderClassList();
+        renderCalendar();
+        if (selectedYear !== null) {
+            showEventsForDay(selectedYear, selectedMonth, selectedDay);
+        } else {
+            selectDay(year, month, day);   
+        }
     }
-    
-    events = [];
 }
 
 function setupModals() {
@@ -741,6 +846,9 @@ function setupButtons() {
     document.getElementById("addClassBtn").onclick = function() { openClassModal(); };
     document.getElementById("selectAllBtn").onclick = selectAllClasses;
     document.getElementById("clearAllBtn").onclick = clearAllClasses;
+
+    let loadSampleDataBtn = document.getElementById("loadSampleDataBtn");
+    if (loadSampleDataBtn) loadSampleDataBtn.onclick = loadSampleData;
 
     let settingsBtn = document.getElementById("settingsBtn");
     if (settingsBtn) settingsBtn.onclick = openSettingsModal;
