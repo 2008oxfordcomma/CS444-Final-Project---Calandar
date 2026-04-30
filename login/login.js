@@ -30,6 +30,7 @@ function submit() {
 
     if (boolLogin) {
         if (loginInfo[username] && loginInfo[username] === password) {
+            localStorage.setItem("currentUser", username);
             window.location.href = "./calendar.html";
         } else {
             createErrorMessage("Invalid username or password");
@@ -40,6 +41,7 @@ function submit() {
         } else {
             loginInfo[username] = password;
             saveData();
+            localStorage.setItem("currentUser", username);
             clearInputs();
             window.location.href = "./calendar.html";
         }
@@ -47,16 +49,35 @@ function submit() {
 }
 
 function saveData() {
-    let dataToSave = { loginInfo: loginInfo };
-    localStorage.setItem("loginData", JSON.stringify(dataToSave));
+    let username = document.getElementById("inputUsername").value;
+    if (!username) {
+        return;
+    }
+
+    let dataToSave = {loginInfo: loginInfo};
+    let allUserData = localStorage.getItem("allCalendarData");
+    if (allUserData) {
+        allUserData = JSON.parse(allUserData);
+    } else {
+        allUserData = {};
+    }
+    allUserData[username] = dataToSave;
+    localStorage.setItem("allCalendarData", JSON.stringify(allUserData));
 }
 
 function loadData() {
-    let savedData = localStorage.getItem("loginData");
-    if (savedData) {
-        let data = JSON.parse(savedData);
-        loginInfo = data.loginInfo || {};
-        return true;
+    let username = document.getElementById("inputUsername").value;
+    if (!username) {
+        return false;
+    }
+    
+    let allUserData = localStorage.getItem("allCalendarData");
+    if (allUserData) {
+        let data = JSON.parse(allUserData);
+        if (data[username]) {
+            loginInfo = data[username].loginInfo || {};
+            return true;
+        }
     }
     return false;
 }
@@ -84,7 +105,6 @@ function clearErrorMessageIfExist(){
 }
 function clearInputs() {
     document.getElementById("inputUsername").value = "";
-    document.getElementById("inputPassword").value = "";
 }
 
 
