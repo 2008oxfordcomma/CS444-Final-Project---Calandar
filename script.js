@@ -887,7 +887,12 @@ function loadTheme() {
     else if(savedTheme === 'shine'){
         appylytheme('shine');
         document.getElementById('themeSelect').value = 'shine';
-    } else {
+    }
+    else if(savedTheme === 'italy'){
+        appylytheme('italy');
+        document.getElementById('themeSelect').value = 'italy';
+    } 
+    else {
         applyTheme('light');
         if (document.getElementById('themeSelect')) {
             document.getElementById('themeSelect').value = 'light';

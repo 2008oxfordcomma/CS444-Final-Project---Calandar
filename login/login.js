@@ -104,7 +104,9 @@ function clearErrorMessageIfExist(){
     }
 }
 function clearInputs() {
-    document.getElementById("inputUsername").value = "";
+    document.getElementById("inputPassword").value = "";
+    //document.getElementById("inputUsername").value = "";
+
 }
 
 

@@ -144,11 +144,44 @@
     --event-text: #000000;
 }
 
-* {
+/* italy mode */
+[data-theme="italy"] {
+    --bg-body: #f7f5f1;
+    --bg-main: #f7f5f1;
+    --bg-card: #cbbe8b;;
+    --text-primary: #363636;
+    --text-secondary: #4b5563;
+    --text-muted: #6b7280;
+    --border-color: #1f2937;
+    --border-light: #e5e7eb;
+    --header-bg: #ffcb00;
+    --event-bg: #e5e7eb;
+    --event-border: #4b5563;
+    --event-completed: #d1d5db;
+    --empty-cell: #e8e2d1;
+    --selected-day: #765e32;
+    --selected-event: #484949;
+    --btn-primary: #357cd2;
+    --btn-hover: #e99004;
+    --btn-success: #10b981;
+    --btn-danger: #ef4444;
+    --btn-info: #3b82f6;
+    --modal-header: #f9fafb;
+    --input-border: #d1d5db;
+    --event-text: #4b5563;
+    --bg-hover: white;
+    --scrollbar-track: #f1f1f1;
+    --scrollbar-thumb: #888;
+    --selected-event-text: white;
+}
+
+/* END OF THEMES*/
+*{
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
+
 body {
   background: var(--bg-body);
   color: var(--text-primary);
