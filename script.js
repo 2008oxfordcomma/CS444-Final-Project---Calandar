@@ -31,22 +31,44 @@ function startCalendar() {
 }
 
 function saveData() {
+    if (!currentUsername) return;
+    
     let dataToSave = {
         events: events,
         classes: classes,
         activeClassFilters: activeClassFilters
     };
-    localStorage.setItem("calendarData", JSON.stringify(dataToSave));
+    
+    let allUserData = localStorage.getItem("allCalendarData");
+    if (allUserData) {
+        allUserData = JSON.parse(allUserData);
+    } else {
+        allUserData = {};
+    }
+    
+    if (!allUserData[currentUsername]) {
+        allUserData[currentUsername] = {};
+    }
+    
+    allUserData[currentUsername].calendarData = dataToSave;
+    localStorage.setItem("allCalendarData", JSON.stringify(allUserData));
 }
 
 function loadData() {
-    let savedData = localStorage.getItem("calendarData");
-    if (savedData) {
-        let data = JSON.parse(savedData);
-        events = data.events || [];
-        classes = data.classes || [];
-        activeClassFilters = data.activeClassFilters || [];
-        return true;
+    currentUsername = localStorage.getItem("currentUser");
+    
+    if (!currentUsername) return false;
+    
+    let allUserData = localStorage.getItem("allCalendarData");
+    if (allUserData) {
+        let data = JSON.parse(allUserData);
+        if (data[currentUsername] && data[currentUsername].calendarData) {
+            let calendarData = data[currentUsername].calendarData;
+            events = calendarData.events || [];
+            classes = calendarData.classes || [];
+            activeClassFilters = calendarData.activeClassFilters || [];
+            return true;
+        }
     }
     return false;
 }
