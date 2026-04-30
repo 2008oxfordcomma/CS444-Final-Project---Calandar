@@ -209,7 +209,8 @@ button {
   margin: 0 auto;
   padding: 1.5rem;
   background: var(--bg-main);
-  min-height: calc(100vh - 64px);
+  min-height: calc(100vh - 64px - 2rem);
+  padding-bottom: 2rem;
 }
 .calendar-box {
   border: 2px solid var(--border-color);
