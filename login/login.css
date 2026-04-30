@@ -99,3 +99,10 @@ input{
     background: unset;
     margin: 0.5rem;
 }
+
+/* for all my mobile homies out here ~ shoutout to my OGs >:O  */
+@media (max-width: 600px){
+    body{
+        transform: scale(1.00);
+    }
+}
