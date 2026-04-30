@@ -86,6 +86,35 @@
     --selected-event-text: #000000;
 }
 
+/* 4B08A1 (secondary bg-card)*/
+/* 3C0680 primary (top 2)*/
+[data-theme="winona"]{
+    --bg-body: #3C0680;
+    --bg-main: #3C0680;
+    --bg-card: #4B08A1;
+    --text-primary: white;
+    --text-secondary: #DDDDDD;
+    --text-muted: #CCCCCC;
+    --border-color: #000000;
+    --border-light: #202020;
+    --header-bg: #333333;
+    --event-bg: #222222;
+    --event-border: #737373;
+    --event-completed: #222222;
+    --empty-cell: #2f405c;
+    --selected-day: #8c70b0;
+    --selected-event: #171717;
+    --btn-primary: #222222;
+    --btn-hover: #292a2da2;
+    --modal-header: #000000;
+    --input-border: #511b78;
+    --scrollbar-track: #ba99d0;
+    --scrollbar-thumb: #ba99d0;
+    --selected-event-text: #ba99d0;
+    --event-text: #BBBBBB;
+
+}
+
 * {
   margin: 0;
   padding: 0;

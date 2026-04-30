@@ -329,6 +329,9 @@ function openEventModal(eventId = null) {
     let modal = document.getElementById("eventModal");
     let title = document.getElementById("eventModalTitle");
     let classSelect = document.getElementById("eventClass");
+
+    //closes modal when clicked outside of modal child
+    modalCloseWhenClickedOutside(modal);
     
     classSelect.innerHTML = '<option value="">-- No Class --</option>';
     for (let i = 0; i < classes.length; i++) {
@@ -483,6 +486,9 @@ function saveEvent(e) {
 function openClassModal(classId = null) {
     let modal = document.getElementById("classModal");
     let title = document.getElementById("classModalTitle");
+
+    //adds event handler to modal when clicked outside
+    modalCloseWhenClickedOutside(modal);
     
     if (classId) {
         title.innerHTML = "Edit Class";
@@ -744,6 +750,9 @@ function loadTheme() {
     } else if (savedTheme === 'highContrast') {
         applyTheme('highContrast');
         document.getElementById('themeSelect').value = 'highContrast';
+    } else if (savedTheme === 'winona'){
+        applyTheme('winona');
+        document.getElementById('themeSelect').value = 'winona';
     } else {
         applyTheme('light');
         if (document.getElementById('themeSelect')) {
@@ -752,8 +761,21 @@ function loadTheme() {
     }
 }
 
+
+//given a dom tree element with a child elem. When not clicked on childen node move node.
+function modalCloseWhenClickedOutside(modal){
+    let modalBox = modal.children[0];
+    modal.addEventListener("click", (e) => {
+        //if modalbox is not clicked -> close modal box
+        if(!modalBox.contains(e.target)){
+            modal.style.display = "none";
+        }
+    });
+}
+
 function openSettingsModal() {
     let modal = document.getElementById('settingsModal');
+    modalCloseWhenClickedOutside(modal);
     if (modal) modal.style.display = 'block';
 }
 
