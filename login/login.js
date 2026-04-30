@@ -86,3 +86,10 @@ function clearInputs() {
     document.getElementById("inputUsername").value = "";
     document.getElementById("inputPassword").value = "";
 }
+
+
+function keyboardCheck(event){
+    if(event.key === "Enter"){
+        submit();
+    }
+}

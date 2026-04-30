@@ -753,6 +753,10 @@ function loadTheme() {
     } else if (savedTheme === 'winona'){
         applyTheme('winona');
         document.getElementById('themeSelect').value = 'winona';
+    }
+    else if(savedTheme === 'shine'){
+        appylytheme('shine');
+        document.getElementById('themeSelect').value = 'shine';
     } else {
         applyTheme('light');
         if (document.getElementById('themeSelect')) {
